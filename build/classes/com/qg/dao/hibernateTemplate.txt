@@ -1,0 +1,345 @@
+HibernateTemplate类的使用 
+
+    
+
+public Entity create(Entity entity) throws DaoException {   
+
+try {   
+
+getHibernateTemplate().save(entity);   
+
+return entity;   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("保存 " + entity.getClass().getName()   
+
++ " 实例到数据库失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public void update(Entity entity) throws DaoException {   
+
+try {   
+
+getHibernateTemplate().update(entity);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("更新 " + entity.getClass().getName()   
+
++ " 实例到数据库失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public void delete(Entity entity) throws DaoException {   
+
+try {   
+
+getHibernateTemplate().delete(entity);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("从数据库删除 " + entity.getClass().getName()   
+
++ " 实例失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public void deleteAll(Class clazz) throws DaoException {   
+
+try {   
+
+List result = getHibernateTemplate().loadAll(clazz);   
+
+getHibernateTemplate().deleteAll(result);   
+
+} catch (DataAccessException e) {   
+
+log.error("从数据库删除 " + clazz.getName() + " 的所有记录失败", e);   
+
+throw new DaoException("从数据库删除 " + clazz.getName() + " 的所有记录失败", e);   
+
+}   
+
+}   
+
+ 
+
+public void deleteAll(Collection entities) throws DaoException {   
+
+try {   
+
+getHibernateTemplate().deleteAll(entities);   
+
+} catch(DataAccessException e) {   
+
+throw new DaoException(e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public Object loadByKey(Class clazz, String keyName, Object keyValue)   
+
+throws DaoException {   
+
+try {   
+
+List result = getHibernateTemplate().find(   
+
+"from " + clazz.getName() + " where " + keyName + " = ?",   
+
+keyValue);   
+
+if (result != null && result.size() > 0) {   
+
+return result.get(0);   
+
+} else {   
+
+return null;   
+
+}   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("加载 " + keyName + " 为 " + keyValue + " 的 "   
+
++ clazz.getName() + " 实例失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List loadAll(Class clazz) throws DaoException {   
+
+try {   
+
+returngetHibernateTemplate().loadAll(clazz);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("加载所有 " + clazz.getName() + " 实例时失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List find(String queryString) throws DaoException {   
+
+try {   
+
+returngetHibernateTemplate().find(queryString);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("执行查询 " + queryString + " 失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List find(String queryString, Object param) throws DaoException {   
+
+try {   
+
+returngetHibernateTemplate().find(queryString, param);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("执行参数为 " + param + " 的查询 " + queryString   
+
++ " 失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List find(String queryString, Object[] params) throws DaoException {   
+
+try {   
+
+returngetHibernateTemplate().find(queryString, params);   
+
+} catch (DataAccessException e) {   
+
+StringBuffer paramString = new StringBuffer("");   
+
+for (int i = 0; i < params.length; i++) {   
+
+paramString.append(params[i]);   
+
+paramString.append(" ");   
+
+}   
+
+            throw new DaoException("执行参数为 " + paramString + "的查询 "   
+
++ queryString + " 失败", e);   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List findByNamedQuery(String queryName) throws DaoException {   
+
+try {    
+
+returngetHibernateTemplate().findByNamedQuery(queryName);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("执行命名为 " + queryName + " 的查询失败");   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List findByNamedQuery(String queryName, Object param)   
+
+throws DaoException {   
+
+try {   
+
+returngetHibernateTemplate().findByNamedQuery(queryName, param);   
+
+} catch (DataAccessException e) {   
+
+            throw new DaoException("执行参数为 " + param + " 命名为 " + queryName   
+
++ " 的查询失败");   
+
+}   
+
+}   
+
+ 
+
+   
+
+public List findByNameQuery(String queryName, Object[] params)   
+
+throws DaoException {   
+
+try {   
+
+returngetHibernateTemplate().findByNamedQuery(queryName, params);   
+
+} catch (DataAccessException e) {   
+
+StringBuffer paramString = new StringBuffer("");   
+
+for (int i = 0; i < params.length; i++) {   
+
+paramString.append(params[i]);   
+
+paramString.append(" ");   
+
+}   
+
+throw new DaoException("执行参数为 " + paramString + "命名为 " + queryName   
+
++ " 的查询失败");   
+
+}   
+
+} 
+
+ 
+
+    public List queryPageExpertByAll(final int userId,final int start,final int pageSize) throws Exception {
+
+        HibernateTemplate ht = new HibernateTemplate(sessionFactory);
+
+        List list = ht.executeFind(new HibernateCallback()
+
+        {
+
+            public Object doInHibernate(Session session)
+
+                    throws HibernateException, SQLException
+
+            {
+
+                List list = session.createQuery(
+
+        "select a from AbroadExpert a where a.user.id="+userId+" and a.editState=0 and a.onlySign=1 order by a.submitTime desc").setFirstResult(start)
+
+.setMaxResults(pageSize).list();
+
+                return list;
+
+            }
+
+        });
+
+        return list;
+
+    }
+
+HibernateTemplate 提供非常多的常用方法来完成基本的操作，比如通常的增加、删除、修改、查询等操作， Spring 2.0 更增加对命名 SQL 查询的支持，也增加对分页的支持。大部分情况下，使用 Hibernate 的常规用法，就可完成大多数 DAO 对象的 CRUD 操作。下面是 HibernateTemplate 的常用方法简介：
+
+q      void delete(Object entity) ：删除指定持久化实例
+
+q      deleteAll(Collection entities) ：删除集合内全部持久化类实例
+
+q      find(String queryString) ：根据 HQL 查询字符串来返回实例集合
+
+q      findByNamedQuery(String queryName) ：根据命名查询返回实例集合
+
+q      get(Class entityClass, Serializable id) ：根据主键加载特定持久化类的实例
+
+q      save(Object entity) ：保存新的实例
+
+q      saveOrUpdate(Object entity) ：根据实例状态，选择保存或者更新
+
+q      update(Object entity) ：更新实例的状态，要求 entity 是持久状态
+
+q      setMaxResults(int maxResults) ：设置分页的大小
